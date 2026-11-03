@@ -1,112 +1,117 @@
-![GitHub license](https://img.shields.io/github/license/torresflo/Spriters-Resource-Downloader.svg)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
-![GitHub contributors](https://img.shields.io/github/contributors/torresflo/Spriters-Resource-Downloader.svg)
-![GitHub issues](https://img.shields.io/github/issues/torresflo/Spriters-Resource-Downloader.svg)
+# Spriters Resource Downloader (GUI)
 
-<p align="center">
-  <h1 align="center">Spriters Resource Downloader</h3>
+A **SOG Interactive (Stroke of Genius Interactive)** tool.
 
-  <p align="center">
-    A downloader for the website <a href="https://www.spriters-resource.com">Spriters Resource</a>
-    <br />
-    <a href="https://github.com/torresflo/Spriters-Resource-Downloader/issues">Report a bug or request a feature</a>
-  </p>
-</p>
+A point-and-click Windows app that downloads sprite sheets from
+[The Spriters Resource](https://www.spriters-resource.com).
 
-## Table of Contents
+> **Credits:** based on [Spriters-Resource-Downloader](https://github.com/torresflo/Spriters-Resource-Downloader)
+> by **torresflo**, the original command-line downloader this app grew from (GPL v3). The app shows
+> this credit on its start screen and in its Credits panel.
 
-* [Introduction](#introduction)
-* [Getting Started](#getting-started)
-  * [Prerequisites and dependencies](#prerequisites-and-dependencies)
-  * [Installation](#installation)
-* [Usage](#usage)
-  * [Command line options](#command-line-options)
-* [Contributing](#contributing)
-* [License](#license)
+Paste a game page address, pick a folder, and either **download everything** or
+**inventory first**: the app lists every sheet on the page with its thumbnail,
+grouped in the same sections as the website, with checkboxes on every section and
+every sheet so you can choose exactly what to download.
 
-## Introduction
+## Quick start
 
-This repository contains a command line application to simply download all sprites and spritesheets of a given game from the website [Spriters Resource](https://www.spriters-resource.com) (`https://www.spriters-resource.com`).
+**Option A - installer (no Python needed)**
 
-## Getting Started
+1. Download **`Spriters.Resource.Downloader.Setup.exe`** from the
+   [latest release](https://github.com/SOG-Interactive/Spriters-Resource-Downloader-GUI/releases/latest)
+   and double-click it. (Windows SmartScreen may warn once; the file is not code-signed.)
+2. Click **Install**. It installs to `%LOCALAPPDATA%\Programs\Spriters Resource Downloader`
+   and puts a **Spriters Resource Downloader** shortcut on your Desktop and in the Start Menu.
+3. Double-click the shortcut to launch. To remove it later, use Settings > Apps or run
+   `Uninstall.bat` from the install folder.
 
-For users, you can just download the [latest release](https://github.com/torresflo/Spriters-Resource-Downloader/releases/latest) of the application and jump [here](#usage).
+**Option B - run from source**
 
-Next information is mainly dedicated to developers who wants to run the application in a more pythonish way.
+1. Install [Python 3.9 or newer](https://www.python.org/downloads/windows/) if you
+   do not have it (tick *Add python.exe to PATH* in the installer).
+2. Double-click **`Start Spriters Downloader.bat`**.
+   The first run creates a private `.venv` folder and installs two small libraries;
+   later runs start straight away.
 
-### Prerequisites and dependencies
+Either way, two windows open:
 
-This repository is tested on Python 3.7+.
+* **Spriters Resource Downloader** - the app.
+* **Site browser** - a real browser tab on the website. Leave it open.
 
-You should install Spriters Resource Downloader in a [virtual environment](https://docs.python.org/3/library/venv.html). If you're unfamiliar with Python virtual environments, check out the [user guide](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/).
-First, create a virtual environment with the version of Python you're going to use and activate it.
+## Using it
 
-You can install directly all required packages by using the file `requirements.txt` and doing:
-```bash
-pip install -r requirements.txt
+**Start screen**
+
+* *Game page address* - for example
+  `https://www.spriters-resource.com/game_boy_gbc/pokemongoldsilver/`.
+  A sheet address (`.../asset/12345/`) also works; its game page is used.
+* *Download to* - any folder. Files are organised as
+  `Console \ Game \ Section \ Sheet name.png` and a `catalog.json` is written next to
+  them listing everything that was found and downloaded.
+* Options: load thumbnails, extract `.zip` sheets into folders, skip files that
+  already exist, include NSFW sheets (flips the site's own toggle).
+* **Download everything** grabs every sheet on the page.
+* **Inventory first** opens the catalog.
+
+**Catalog screen**
+
+* Every section has a checkbox (tick/untick the whole section) and an *Only this* button.
+* Every sheet is a card with its thumbnail and a checkbox; click anywhere on the card to toggle it.
+* Toolbar: *Select all*, *Deselect all*, *Invert*, a filter box (matches sheet or section
+  names) with *Select shown* / *Deselect shown*, sort by page order or name, thumbnail size,
+  *Only selected* view, *Expand all* / *Collapse all*.
+* **Download selected** at the bottom.
+
+**Progress screen** shows a progress bar, a log of every file, counts of done / skipped /
+failed, a *Cancel* button and, when finished, *Open folder*.
+
+## About the "Verify you are human" check
+
+The website is protected by a bot check that only a real browser can pass. That is why
+the app opens a real browser window (Microsoft Edge WebView2, built into Windows 10/11).
+If that window shows a *Verify you are human* box, click it yourself once; the app waits,
+then reads pages and files through that same window. Your clearance is kept in the app's
+own browser profile (`%LOCALAPPDATA%\SpritersResourceDownloader`), so you rarely see the
+check again. If it reappears in the middle of a download, the app pauses, asks you to click
+it again, and then carries on where it left off.
+
+The app never tries to bypass or auto-click that check.
+
+## Developers
+
+```
+.venv\Scripts\python.exe -I tests\test_parser.py      # parser / naming unit tests (offline)
+.venv\Scripts\python.exe tests\e2e_offline.py          # full app run against a local fixture server
+.venv\Scripts\python.exe tests\fixture_server.py --challenge   # keep the fixture server up
+set SRD_BASE_URL=http://127.0.0.1:PORT                   # point the app at it
+.venv\Scripts\python.exe -m srd_gui
 ```
 
-### Installation
-
-Follow the instructions above then clone the repo (`git clone https:://github.com/torresflo/Spriters-Resource-Downloader.git`).\
-You can now launch the app by running `spriters-resource-downloader.py`.
-
-## Usage
-
-Just launch the application with:
-
-For users:
-```
-spriters-resource-downloader.exe [-h] [-v] url
-```
-
-For developers:
-```
-python spriters-resource-downloader.py [-h] [-v] url
-```
-
-### Command line options
-
-Here are the possible arguments:
+Building the installer (needs the `.venv` from Option B):
 
 ```
-positional arguments:
-  url            URL to a game on the website spriters-resource.com
-
-optional arguments:
-  -h, --help     Show this help message and exit
-  -v, --verbose  Use it to print progress during download
-  --nsfw         Use it to allow download of nsfw content
+.venv\Scripts\python.exe -m pip install pyinstaller
+.venv\Scripts\python.exe build_installer.py
 ```
 
-It is recommended to activate the verbose mode (optional, not activated by default) to keep track of the progress.
+This produces `dist\Spriters Resource Downloader Setup.exe` (the double-click installer) and a
+portable copy of the app in `dist\Spriters Resource Downloader\`. The installer source is
+`installer\setup_app.py`; `Setup.exe /S` installs silently with defaults.
 
-### Example
+Layout:
 
-The next command line will download all the sprites referenced on this [page](https://www.spriters-resource.com/game_boy_gbc/pokemongoldsilver/) and put them in the folder `downloaded/game_boy_gbc/pokemongoldsilver/` while printing progress during download:
+* `srd_gui/parser.py` - pure HTML parsing (game page sections/items, asset page download link).
+* `srd_gui/session.py` - the browser session: readiness probe, in-page `fetch()` bridge.
+* `srd_gui/downloader.py` - inventory, thumbnails, download job, zip extraction, manifest.
+* `srd_gui/app.py` - windows, the JS-facing API, process lock.
+* `srd_gui/ui/` - the interface (plain HTML/CSS/JS).
+* `tests/fixtures/` - archived copies of real pages the parser is tested against.
 
-For users:
-```
-spriters-resource-downloader.exe -v https://www.spriters-resource.com/game_boy_gbc/pokemongoldsilver/
-```
+The original command-line script (`spriters-resource-downloader.py`, `Downloader/`) predates
+the site's bot check and no longer works unattended. It is kept for reference; its
+dependencies are listed in `requirements-legacy-cli.txt`.
 
-For developers:
-```
-python spriters-resource-downloader.py -v https://www.spriters-resource.com/game_boy_gbc/pokemongoldsilver/
-```
-
-
-## Contributing
-
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-<!-- LICENSE -->
 ## License
 
 Distributed under the GNU General Public License v3.0. See `LICENSE` for more information.
